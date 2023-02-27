@@ -27,8 +27,8 @@ module.exports = {
     createThought(req, res) {
         Thought.create(req.body)
         .then(({ _id }) => {
-            return User.fineOneAndUpdate(
-                { _id: body.userId },
+            return User.findOneAndUpdate(
+                { _id: req.body.userId },
                 { $push: { thoughts: _id } },
                 { new: true }
             )
@@ -61,18 +61,18 @@ module.exports = {
             : User.findOneAndUpdate(
                 { thoughts: req.params.id },
                 { $pull: { thoughts: req.params.id } },
-                { new: true }
+                { new: true },
             )
         })
-        res.json({ message: 'Thought successfully deleted!'})
+        .then(() => res.json({ message: 'Thought deleted!' }))
         .catch((err) => {
-            res.status(500).json(err)
+            res.json(err)
         })
     },
     addReaction(req, res) {
         Thought.findOneAndUpdate(
-            { _id: req.params.id },
-            { $addToSet: { reactions: req.body  } },
+            { _id: req.params.thoughtId },
+            { $addToSet: { reactions: req.body } },
             { new: true, runValidators: true }
         )
         .then((thoughts) => {
@@ -84,8 +84,8 @@ module.exports = {
     },
     removeReaction(req, res) {
         Thought.findOneAndUpdate(
-            { _id: req.params.id },
-            { $pull: { reactions: req.body  } },
+            { _id: req.params.thoughtId },
+            { $pull: { reactions: req.body } },
             { new: true }
         )
         .then((thoughts) => {
