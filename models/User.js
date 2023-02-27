@@ -1,18 +1,18 @@
-const { Schema, Model } = require('mongoose');
-import { isEmail } from 'validator';
+const { Schema, model } = require('mongoose');
+const { isEmail } = require('validator');
 
 const userSchema = new Schema(
     {
         username: {
-            String,
+            type: String,
             unique: true,
-            required: true,
-            trim: true
-        },
+            trim: true,
+            required: 'Username is required',
+          },
         email: {
-            String,
+            type: String,
             unique: true,
-            required: true,
+            required: 'Email is required',
             validate: [isEmail, 'Invalid Email']
         },
         thoughts: [
@@ -39,6 +39,6 @@ userSchema.virtual('friendCount').get(function() {
     return this.friends.length;
 });
 
-const User = Model('User', userSchema);
+const User = model('User', userSchema);
 
 module.exports = User;
